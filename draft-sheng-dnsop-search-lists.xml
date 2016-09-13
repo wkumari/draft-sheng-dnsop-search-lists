@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="US-ASCII"?>
+<!DOCTYPE rfc SYSTEM "rfc2629.dtd" [
+<!ENTITY RFC2119 SYSTEM "http://xml.resource.org/public/rfc/bibxml/reference.RFC.2119.xml">
+<!ENTITY RFC2629 SYSTEM "http://xml.resource.org/public/rfc/bibxml/reference.RFC.2629.xml">
+<!ENTITY RFC3552 SYSTEM "http://xml.resource.org/public/rfc/bibxml/reference.RFC.3552.xml">
+<!ENTITY RFC5226 SYSTEM "http://xml.resource.org/public/rfc/bibxml/reference.RFC.5226.xml">
+]>
+<!-- SS: Set category, IPR, docName -->
+<rfc category="bcp" docName="draft-sheng-search-list-1.0" ipr="trust200902">
+  <?xml-stylesheet type='text/xsl' href='rfc2629.xslt' ?>
+
+  <?rfc toc="yes" ?>
+
+  <?rfc symrefs="yes" ?>
+
+  <?rfc sortrefs="yes"?>
+
+  <?rfc iprnotified="no" ?>
+
+  <?rfc strict="yes"?>
+
+  <?rfc compact="yes" ?>
+
+  <front>
+    <!--c SS: Set long title. -->
+
+    <title abbrev="Deprecating DNS Search Lists">Considerations for Deprecating DNS search lists</title>
+
+      <author fullname="Steve Sheng" initials="S." surname="Sheng">
+      <organization abbrev="ICANN">Internet Corporation for Assigned Names and
+      Numbers</organization>
+
+      <address>
+        <postal>
+          <street>12025 Waterfront Drive, Suite 300</street>
+
+          <country>United States of America</country>
+
+          <code>90094</code>
+
+          <city>Los Angeles</city>
+        </postal>
+
+        <phone>+1.310.301.5800</phone>
+
+        <email>steve.sheng@icann.org</email>
+      </address>
+    </author>
+      
+    <author fullname="Andrew McConachie" initials="A." surname="McConachie">
+    <organization abbrev="ICANN">Internet Corporation for Assigned Names and
+      Numbers</organization>
+
+      <address>
+        <postal>
+          <street>12025 Waterfront Drive, Suite 300</street>
+
+          <country>United States of America</country>
+
+          <code>90094</code>
+
+          <city>Los Angeles</city>
+        </postal>
+
+        <phone>+1.310.301.5800</phone>
+
+        <email>andrew.ccconachie@icann.org</email>
+      </address>
+    </author>
+
+          <author fullname="Warren Kumari" initials="W." surname="Kumari">
+      <organization>Google</organization>
+
+      <address>
+        <postal>
+          <street>1600 Amphitheatre Parkway</street>
+
+          <city>Mountain View, CA</city>
+
+          <code>94043</code>
+
+          <country>US</country>
+        </postal>
+
+        <email>warren@kumari.net</email>
+      </address>
+    </author>
+
+      
+      
+    <date day="22" month="June" year="2016"/>
+
+    <abstract>
+        
+      <t>A Domain Name System (DNS) "search list" (hereafter, simply "search list") is
+conceptually implemented as an ordered list of domain names. When the user enters
+a name, the domain names in the search list are used as suffixes to the user-supplied
+name, one by one, until a domain name with the desired associated data is found or the search list is exhausted. </t>
+        
+        <t>
+Processing search lists was weakly standardized in early Requests For Comments
+(RFCs) and implemented in most operating systems. However, as the Internet has
+grown, search list behavior has diversified. Applications (e.g., web browsers and mail
+clients) and DNS resolvers process search lists differently. In addition, some of these
+behaviors present security and privacy issues to end systems, can lead to performance
+problems for the Internet, and might cause collision with names provisioned under the
+newly delegated top-level domains. </t>
+
+        <t> In this document, we suggested several options to deprecate the use of search lists. </t>
+     
+
+      <t>[ Ed note (remove): This document is being developed in github:
+      https://github.com/stevesheng/id-search-list/draft-sheng-search-list . ]</t>
+    </abstract>
+  </front>
+
+  <middle>
+    <section title="Introduction">
+   
+        <t>Many organizations create subdomains under their primary domain(s) to delegate or distribute management of the namespace, reduce the load on the authoritative DNS servers, and more easily distinguish a host's organizational and/or geographical affiliations. </t>
+        
+        <t> As a convenience to users, many operating systems implement search list processing, a feature that allows a user to enter a partial name in an application, with the operating system expanding the name through entries in a search list. For example, if a user has a search list of "corp.example.com;berlin.example.com;example.com" and she types "system" into her browser's address box, the operating system would try "system.corp.example.com", "system.berlin.example.com", "system.example.com", and perhaps "system." in some order.</t>
+
+        <t> Search list processing, including order of operations for search list processing, was loosely specified in <xref target="RFC1123"/>(specifically, section 6.1.4.3 (2)),  <xref target="RFC1535"/>, and <xref target="RFC1536"/> and has been implemented in most operating systems. However, as the Internet has grown, search list behavior has diversified. Applications (e.g., web browser and mail clients) and DNS resolvers process search list suffixes differently. Some of these behaviors also present security and privacy issues to end systems, and performance problems both for the end system and the Internet. </t>
+            
+<t> In this document, we suggested several options to deprecate the use of search lists. </t>
+        
+      <section title="Requirements notation">
+        <t>The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+        "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this
+        document are to be interpreted as described in <xref
+        target="RFC2119"/>.</t>
+      </section>
+    </section>
+
+    <section title="Proposal">
+      <t> No automatically generated search lists. Administrators (including DHCP server administrators) should configure the search list explicitly, and must not use implicit search lists (as defined in Section 2). Where DNS parameters such as the domain search list have been manually configured, these parameters should not be overridden by DHCP. These are suggested default processing rules. Operating system / resolve vendors may provide configuration options to override these. </t>
+
+      <t> Unqualified Single-Label Domain Names Are Never Queried Directly. When a user enters a single label name, that name may be subject to search list processing if a search list is specified, but must never be queried in the DNS in its original single-label form.</t>
+        
+<t> Unqualified Multi-label Domain Names Never Use Search Lists. When a user queries a hostname that contain two or more labels separated by dots, such as www.server, applications and resolvers must query the DNS directly. Search lists must not be applied even if such names do not resolve.</t>
+
+      </section>
+
+      <section title="Negative Consequences For the Change">
+          
+          <t> There are administrators that today rely on both automatic generation of search lists, and the automatic propagation of search lists to clients via DHCP. The proposed change would require reconfiguration of systems. </t>
+          
+          <t> There are users, and links in web pages, that use partially qualified names (such as www.corp) instead of either just a single token or a fully qualified domain name.</t>
+          
+          <t> Changing search list behavior of unqualified multi-label domain names would reduce the utility of these names. </t>
+          
+          <t> Finally, not all applications currently in use treat these categories of domain names in the same way. Incompatibilities and operational problems, specifically in BYOD (Bring Your Own Device) environments, already exist. </t>
+          
+      </section>
+    
+    <section title="IANA Considerations">
+        <t>TBD</t>    
+    </section>
+
+    <section anchor="security" title="Security Considerations">
+    
+      <t>TBD</t>
+      </section>
+
+    <section title="Acknowledgements">
+      <t>Thanks to the ICANN Security and Stability Advisory Committee.</t>
+    </section>
+  </middle>
+
+  <back>
+    <references title="Normative References">
+
+      <?rfc include='reference.RFC.2119'?>
+        
+      <?rfc include='reference.RFC.1034'?>
+
+      <?rfc include='reference.RFC.1123'?>
+
+      <?rfc include='reference.RFC.1535'?>
+
+      <?rfc include='reference.RFC.1536'?>
+
+      <?rfc include='reference.RFC.3397'?>
+
+      <?rfc include='reference.RFC.3646'?>
+        
+    </references>
+
+    <section title="Changes / Author Notes.">
+      <t>[RFC Editor: Please remove this section before publication ]</t>
+
+      <t>From initial to -00.</t>
+
+      <t><list style="symbols">
+          <t>Nothing changed in the template!</t>
+        </list></t>
+    </section>
+  </back>
+</rfc>
