@@ -13,7 +13,7 @@ Expires: December 24, 2016                                     W. Kumari
 
 
             Considerations for Deprecating DNS search lists
-                      draft-sheng-search-list-1.0
+                       draft-sheng-search-list-00
 
 Abstract
 
@@ -39,7 +39,7 @@ Abstract
 
    [ Ed note (remove): This document is being developed in github:
    https://github.com/stevesheng/id-search-list/draft-sheng-search-list
-   . ]
+   .  ]
 
 Status of This Memo
 
