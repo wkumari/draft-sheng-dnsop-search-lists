@@ -21,8 +21,8 @@ Abstract
    list") is conceptually implemented as an ordered list of domain
    names.  When the user enters a name, the domain names in the search
    list are used as suffixes to the user-supplied name, one by one,
-   until a domain name with the desired associated data is found or the
-   search list is exhausted.
+   until either a name is successfully resolved or the search list is
+   exhausted.
 
    Processing search lists was weakly standardized in early Requests For
    Comments (RFCs) and implemented in most operating systems.  However,
@@ -141,12 +141,13 @@ Internet-Draft        Deprecating DNS Search Lists             June 2016
 
 2.  Proposal
 
-   No automatically generated search lists.  Administrators (including
-   DHCP server administrators) should configure the search list
-   explicitly, and must not use implicit search lists (as defined in
-   Section 2).  Where DNS parameters such as the domain search list have
-   been manually configured, these parameters should not be overridden
-   by DHCP.  These are suggested default processing rules.  Operating
+   No automatically generated search lists.  [TODO: What is an
+   automatically generated search list?]  Administrators (including DHCP
+   server administrators) should configure the search list explicitly,
+   and must not use implicit search lists (as defined in Section 2).
+   Where DNS parameters such as the domain search list have been
+   manually configured, these parameters should not be overridden by
+   DHCP.  These are suggested default processing rules.  Operating
    system / resolve vendors may provide configuration options to
    override these.
 
@@ -160,7 +161,6 @@ Internet-Draft        Deprecating DNS Search Lists             June 2016
    dots, such as www.server, applications and resolvers must query the
    DNS directly.  Search lists must not be applied even if such names do
    not resolve.
-
 
 
 
