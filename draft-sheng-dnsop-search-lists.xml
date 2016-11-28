@@ -1,17 +1,16 @@
 <?xml version="1.0" encoding="US-ASCII"?>
 <!DOCTYPE rfc SYSTEM "rfc2629.dtd" [
-<!ENTITY RFC1034 SYSTEM "http://xml.resource.org/public/rfc/bibxml/reference.RFC.1034.xml">
 <!ENTITY RFC1123 SYSTEM "http://xml.resource.org/public/rfc/bibxml/reference.RFC.1123.xml">
 <!ENTITY RFC1535 SYSTEM "http://xml.resource.org/public/rfc/bibxml/reference.RFC.1535.xml">
 <!ENTITY RFC1536 SYSTEM "http://xml.resource.org/public/rfc/bibxml/reference.RFC.1536.xml">
 <!ENTITY RFC2119 SYSTEM "http://xml.resource.org/public/rfc/bibxml/reference.RFC.2119.xml">
-<!ENTITY RFC2629 SYSTEM "http://xml.resource.org/public/rfc/bibxml/reference.RFC.3397.xml">
-<!ENTITY RFC3552 SYSTEM "http://xml.resource.org/public/rfc/bibxml/reference.RFC.3646.xml">
-<!ENTITY RFC5226 SYSTEM "http://xml.resource.org/public/rfc/bibxml/reference.RFC.6106.xml">
+<!ENTITY RFC3397 SYSTEM "http://xml.resource.org/public/rfc/bibxml/reference.RFC.3397.xml">
+<!ENTITY RFC3646 SYSTEM "http://xml.resource.org/public/rfc/bibxml/reference.RFC.3646.xml">
+<!ENTITY RFC6106 SYSTEM "http://xml.resource.org/public/rfc/bibxml/reference.RFC.6106.xml">
 ]>
 <!-- SS: Set category, IPR, docName -->
 <rfc category="bcp" docName="draft-sheng-search-list-00" ipr="trust200902" 
-	updates="1536">
+	updates="1535,1536">
   <?xml-stylesheet type='text/xsl' href='rfc2629.xslt' ?>
 
   <?rfc toc="yes" ?>
@@ -75,24 +74,23 @@
       </address>
     </author>
 
-    <date day="26" month="September" year="2016"/>
+    <date day="16" month="November" year="2016"/>
 
 	<area>ops</area>
 	<workgroup>DNS Operations Working Group</workgroup>
 
     <abstract>
       <t>A Domain Name System (DNS) "search list" (hereafter, simply "search
-      list") is an ordered list of domain names. When the user enters a name, the domain names in the search list are used as suffixes to the user-supplied name, one by one, until a domain name with the desired associated data is found or the search list is exhausted.[Ed note: This definintion is lifted from RFC 1123.]</t>
+      list") is an ordered list of domain names. When an application needs to lookup a name on an internet connected host, the domain names in the search list are used as suffixes to the application supplied name, one by one, until a domain name with the desired associated data is found or the search list is exhausted.[Ed note: This definintion is lifted from RFC 1123, then edited.]</t>
 
       <t>Processing search lists was weakly standardized in early Requests For
-      Comments (RFCs)[Ed note: need refs here] and implemented in most operating systems. However, as the Internet has grown, search list behavior has diversified. Applications (e.g., web browsers, mail clients) and DNS resolvers process search lists differently. In addition, some of these behaviors present security and privacy issues to end systems, can lead to
+      Comments (RFCs) <xref target="RFC1535"/> <xref target="RFC1536"/> [Ed note: need more refs here] and implemented in most operating systems. However, as the Internet has grown, search list behavior has diversified. Applications (e.g., web browsers, mail clients) and DNS resolvers process search lists differently. In addition, some of these behaviors present security and privacy issues to end systems, can lead to
       performance problems for the Internet, and can cause collisions with names  provisioned under delegated top-level domains.</t>
 
-      <t>In this document, we make three proposals regarding when and how to use DNS search lists.</t>
+      <t>In this document, we make six proposals regarding when and how to use DNS search lists.</t>
 
       <t>[ Ed note (remove): This document is being developed in github:
-      https://github.com/stevesheng/id-search-list/draft-sheng-search-list.
-      ]</t>
+      https://github.com/wkumari/draft-sheng-dnsop-search-lists ]</t>
     </abstract>
   </front>
 
@@ -108,14 +106,13 @@
       an application, with the operating system expanding the name through
       entries in a search list. For example, if a user has a search list of
       "corp.example.com;berlin.example.com;example.com" and she types "system"
-      into her browser's address box, the operating system would try
-      "system.corp.example.com", "system.berlin.example.com",
+      into her browser's address box, the operating system would attempt resolving "system.corp.example.com", "system.berlin.example.com",
       "system.example.com", and perhaps "system." in some order.</t>
 
       <t>Search list processing, including order of operations for search list
-      processing, was loosely specified in <xref target="RFC1123"/> (specifically, section 6.1.4.3 (2)), <xref target="RFC1535"/>, and <xref target="RFC1536"/> and has been implemented in most operating systems. Processing of search lists received via DHCP and IPv6 Router Advertisements (RA) is standardized in <xref target="RFC3397"/> and <xref target="RFC6106"/>.
+      processing, was loosely specified in <xref target="RFC1123"/> (specifically, section 6.1.4.3 (2)), <xref target="RFC1535"/>, and <xref target="RFC1536"/> and has been implemented in most operating systems. Processing of search lists received via DHCP is standardized in <xref target="RFC3397"/> and <xref target="RFC3646"/>. Processing of search lists received via IPv6 Router Advertisements (RA) is standardized in <xref target="RFC6106"/>.
       
-      As the Internet has grown, search list behavior has diversified. Applications (e.g., web browser and mail clients) and DNS resolvers process search list suffixes differently. Some of these behaviors also present security and privacy issues to end systems <xref target="SAC064"/> <xref target="RFC3397"/>, and performance problems both for the end system and the Internet.</t>
+      As the Internet has grown, search list behavior has diversified. Applications (e.g., web browser and mail clients) and DNS resolvers process search list suffixes differently. Some of these behaviors present security and privacy issues to end systems <xref target="SAC064"/> <xref target="RFC3397"/>, and performance problems both for the hosts and the Internet.</t>
 
       <section title="Requirements notation">
         <t>The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
@@ -124,11 +121,13 @@
       </section>
     </section>
 
-
     <section title="Search List Processing">
-	  <section title="No implicit search lists">
-		<t> Administrators should configure the search list explicitly, and must not use implicit search lists.</t>
+	  <section title="Deprecate search lists">
+	    <t>Search lists SHOULD NOT be used. The security, stability and user expectation issues outweigh the benefit of using search lists in most circumstances. Recognizing that there will still be environments where search list usage cannot be avoided, the following five sections provide guidance on these situations.</t>
+	  </section>
 
+	  <section title="No implicit search lists">
+		<t>If search lists are to be used, administrators SHOULD configure the search list explicitly, and MUST NOT use implicit search lists. An explicitly configured search list is either manually configured on a host or learned by the host via DHCP or IPv6 RAs.</t>
 
 		<t>An implicit search list is a search list derived by a host from some part of its Fully Qualified Domain Name (FQDN). The most common implicit search list is a list with a single entry composed only of the host's immediate parent domain. For example, a host with FQDN a.example.org might have an implicit search list of example.org.</t>
 
@@ -136,17 +135,21 @@
 	  </section>
 
 	  <section title="No overriding manually configured search lists">
-		<t>A search list configured manually on a host by an operator should not be overridden by DHCP or IPv6 Router Advertisements (RA).</t>
+		<t>A search list configured manually on a host by an operator MUST NOT be overridden by DHCP or IPv6 Router Advertisements (RA).</t>
 
 	    <t>For a discussion of how hosts should process DNS search lists learned via DHCP or IPv6 RAs see <xref target="RFC6106"/> section 5.3.1.</t>
 	  </section>
 
-	  <section title="No querying of unqualified single-label domain names">
-		<t>Unqualified single label domain names should not be queried directly.  When a user enters a single label name, that name may be subject to search list processing if a search list is specified, but must never be queried in the DNS in its original single-label form.</t>
+	  <section title="No applying search lists to multi-label domain names">
+		<t>Multi-label domain names MUST NOT use search lists. When a user queries a hostname that contains two or more labels separated by dots, such as www.example, applications MUST query the DNS directly. Search lists MUST NOT be applied even if such names do not resolve.</t>
 	  </section>
 
-	  <section title="No applying search lists to unqualified multi-label domain names">
-		<t>Unqualified multi-label domain names must never use search lists. When a user queries a hostname that contains two or more labels separated by dots, such as www.example, applications must query the DNS directly. Search lists must not be applied even if such names do not resolve.</t>
+	  <section title="No querying of single-label domain names">
+		<t>Single label domain names, aka dotless-domains, MUST NOT be sent by applications for resolution. However, if an application sends a single label name, that name MAY be subject to search list processing if a search list is specified, but MUST NOT be queried in the DNS in its original single-label form.</t>
+	  </section>
+
+	  <section title="No search lists on recursive resolvers">
+	    <t>DNS Recursive resolvers MUST NOT use search lists.</t>
 	  </section>
     </section>
 
@@ -173,7 +176,6 @@
 
   <back>
     <references title="Normative References">
-      <?rfc include='reference.RFC.1034'?>
       <?rfc include='reference.RFC.1123'?>
       <?rfc include='reference.RFC.1535'?>
       <?rfc include='reference.RFC.1536'?>
